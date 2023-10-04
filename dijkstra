@@ -1,0 +1,57 @@
+import heapq
+
+class Grafo:
+    def __init__(self):
+        self.vertices = set()
+        self.aristas = {}
+    
+    def agregar_vertice(self, vertice):
+        self.vertices.add(vertice)
+        if vertice not in self.aristas:
+            self.aristas[vertice] = []
+    
+    def agregar_arista(self, desde, hacia, peso):
+        self.aristas[desde].append((hacia, peso))
+        self.aristas[hacia].append((desde, peso))  # Para grafos no dirigidos
+    
+    def dijkstra(self, origen):
+        distancia = {vertice: float('infinity') for vertice in self.vertices}
+        distancia[origen] = 0
+        cola_prioridad = [(0, origen)]  # Tuplas (distancia, vertice)
+        
+        while cola_prioridad:
+            (dist_actual, vertice_actual) = heapq.heappop(cola_prioridad)
+            
+            if dist_actual > distancia[vertice_actual]:
+                continue
+            
+            for (vertice_vecino, peso_arista) in self.aristas[vertice_actual]:
+                distancia_nueva = dist_actual + peso_arista
+                
+                if distancia_nueva < distancia[vertice_vecino]:
+                    distancia[vertice_vecino] = distancia_nueva
+                    heapq.heappush(cola_prioridad, (distancia_nueva, vertice_vecino))
+        
+        return distancia
+
+# Ejemplo de uso:
+if __name__ == "__main__":
+    grafo = Grafo()
+    grafo.agregar_vertice("A")
+    grafo.agregar_vertice("B")
+    grafo.agregar_vertice("C")
+    grafo.agregar_vertice("D")
+    grafo.agregar_vertice("E")
+    
+    grafo.agregar_arista("A", "B", 2)
+    grafo.agregar_arista("A", "C", 4)
+    grafo.agregar_arista("B", "C", 1)
+    grafo.agregar_arista("B", "D", 7)
+    grafo.agregar_arista("C", "E", 3)
+    grafo.agregar_arista("D", "E", 1)
+    
+    origen = "A"
+    distancias = grafo.dijkstra(origen)
+    
+    for vertice, distancia in distancias.items():
+        print(f"Distancia desde {origen} a {vertice}: {distancia}")
